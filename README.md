@@ -42,10 +42,19 @@ Sensor|Attribute|Unit|Comment
 ## Setup of Graph
 The chart is plotted using [plotlygrap](https://github.com/dbuezas/lovelace-plotly-graph-card). This plugin can be installed using [HACS](https://hacs.xyz) if not already avaible.
 
-Next copy text from this `plotlygraph.yaml` and drop this in a manual card on any of your dashboards and you are done.
+Next copy text from this `plotlygraph.yaml` and drop this in a manual card on any of your dashboards and you are done. The graph is adjustable, eg if you want to adjust the horizontal lines for light and medium rain, just adjust the `y0` and `y1` in the shapes section:
 
-![Example not raining](norain.png "No rain")
-![Example raining](rain.png "Raining waiting for rain ;-)")
+```yaml
+  shapes:
+    - type: line
+      xref: paper
+      y0: 0.1
+      y1: 0.1
+```
+
+## Sample precipitation graph and history
+
+![Example raining](rain.png "rain ;-)")
 ![Example rain expected sensor](rain_expected.png "Rain expected sensor")
 
 
