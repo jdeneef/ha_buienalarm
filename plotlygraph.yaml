@@ -19,7 +19,7 @@ fn: |
       vars.x.push(d)
       p = b2p(b)
       vars.y.push(p)
-      if (p>vars.ymax) vars.ymax=p
+      if (+p>+vars.ymax) vars.ymax=p
       vars.hover.push(String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0") +  " <b>" + 
         p + "</b>" + vars.unit_of_measurement)
     })
