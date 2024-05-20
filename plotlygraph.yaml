@@ -1,0 +1,82 @@
+type: custom:plotly-graph
+title: Buienalarm
+hours_to_show: 2.1
+time_offset: 110m
+refresh_interval: auto
+fn: |
+  $fn ({ hass, vars }) => {
+    b2p = (b) => Math.pow(10,(b-109)/32).toFixed(1)
+    vars.x = []; vars.y = []; vars.color = []; vars.hover = []
+    vars.unit_of_measurement = hass.states['sensor.buienalarm_precipitation_intensity']?.attributes?.unit_of_measurement
+    vars.now = new Date();
+    var t = hass.states['sensor.buienalarm_precipitation_intensity']?.attributes?.start * 1000
+    var precip = hass.states['sensor.buienalarm_precipitation_intensity']?.attributes?.precip || []
+    var delta = hass.states['sensor.buienalarm_precipitation_intensity']?.attributes?.delta * 1000
+    vars.ymax = 0.4
+    precip.forEach(b => {
+      d = new Date(t)
+      t += delta
+      vars.x.push(d)
+      p = b2p(b)
+      vars.y.push(p)
+      if (p>vars.ymax) vars.ymax=p
+      vars.hover.push(String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0") +  " <b>" + 
+        p + "</b>" + vars.unit_of_measurement)
+    })
+    //console.log(vars)
+  }
+entities:
+  - entity: sensor.buienalarm_precipitation_intensity
+    name: ''
+    showlegend: false
+    x: $ex vars.x
+    'y': $ex vars.y
+    mode: scatter
+    fill: tozeroy
+    fillcolor: rgba(00, B3, FF, .6)
+    unit_of_measurement: $ex vars.unit_of_measurement
+    hovertemplate: $ex vars.hover
+    line:
+      color: rgba(00, B3, FF, 1)
+      shape: spline
+      width: 3
+  - entity: ''
+    name: Now
+    hovertemplate: Now
+    showlegend: false
+    x: $ex [ vars.now, vars.now ]
+    'y': $ex [ 0, vars.ymax ]
+    yaxis: y0
+    color: red
+layout:
+  yaxis:
+    rangemode: nonnegative
+    fixedrange: true
+    range: $ex [0, vars.ymax + 0.05 ]
+  xaxis:
+    tickformat: '%H:%M'
+    fixedrange: true
+  shapes:
+    - type: line
+      xref: paper
+      x0: 0
+      x1: 1
+      y0: 0.1
+      y1: 0.1
+      line:
+        color: lightskyblue
+        dash: dot
+        width: 1
+    - type: line
+      xref: paper
+      x0: 0
+      x1: 1
+      y0: 0.25
+      y1: 0.25
+      line:
+        color: deepskyblue
+        dash: dot
+        width: 1
+config:
+  displayModeBar: false
+  scrollZoom: false

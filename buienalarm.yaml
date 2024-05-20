@@ -1,0 +1,32 @@
+rest:
+  - scan_interval: 300
+    resource: https://cdn-secure.buienalarm.nl/api/3.4/forecast.php
+    params:
+      lat: "{{state_attr('zone.home', 'latitude')}}"
+      lon: "{{state_attr('zone.home', 'longitude')}}"
+      region: "nl"
+    sensor:
+      - name: "Buienalarm precipitation intensity"
+        value_template: >-
+          {% set i = ((now()|as_timestamp - value_json['start'])/value_json['delta']) | int %}
+          {% set p = 10**((value_json['precip'][i]-109)/32) %}
+          {{ p | round(1) }}
+        device_class: precipitation_intensity
+        unit_of_measurement: "mm/h"
+        json_attributes:
+          - "precip"
+          - "start"
+          - "delta"
+      - name: "Buienalarm precipitation"
+        device_class: precipitation
+        unit_of_measurement: "mm"
+        state_class: measurement
+        value_template: >-
+          {% set i = ((now()|as_timestamp - value_json['start'])/value_json['delta']) | int %}
+          {% set p = 10**((value_json['precip'][i]-109)/32) %}
+          {{ (p/12) | round(3) }}
+    binary_sensor:
+      - name: "Buienalarm precipitation expected"
+        value_template: >-
+            {{ value_json['precip'][2] + value_json['precip'][3] + value_json['precip'][4] + value_json['precip'][4] + value_json['precip'][6] > 0 }}
+
