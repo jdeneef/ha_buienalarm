@@ -8,6 +8,11 @@ Note that data is used from [buienalarm](https://www.buienalarm.nl), I have no c
 
 **Installation requires copying files to your homeassistant configuration and updating home assistant configuration, so some homeassistant knowledge is required**
 
+What does it do:
+- Create sensors for precipitation forecast
+- add a graph showing the expected rain for the next 2 hours, sort of following buienalarm app
+- add a true/false sensor triggering to true when rain is expected coming 5-30 mins approx, used for eg opening sun screens etc.
+
 # Installation
 This setup adds a [RESTful integration](https://www.home-assistant.io/integrations/rest/) to your homeassistant, polling the api every 5mins. To make the data visible I added a plotly graph showing sort of the same chart as the buienalarm app.
 
