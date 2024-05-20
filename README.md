@@ -46,4 +46,6 @@ Next copy text from this `plotlygraph.yaml` and drop this in a manual card on an
 
 ![Example not raining](norain.png "No rain")
 ![Example raining](rain.png "Raining waiting for rain ;-)")
+![Example rain expected sensor](rain_expected.png "Rain expected sensor")
+
 
