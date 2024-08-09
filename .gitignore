@@ -1,2 +1,2 @@
 .session.nvim
-mmark.html
+*.env.json
