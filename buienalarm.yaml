@@ -2,8 +2,8 @@ rest:
   - scan_interval: 300
     resource: https://cdn-secure.buienalarm.nl/api/3.4/forecast.php
     params:
-      lat: "{{state_attr('zone.home', 'latitude')}}"
-      lon: "{{state_attr('zone.home', 'longitude')}}"
+      lat: "{{state_attr('zone.home', 'latitude') | float(0) | round(1)}}"
+      lon: "{{state_attr('zone.home', 'longitude') | float(0) | round(1)}}"
       region: "nl"
     sensor:
       - name: "Buienalarm precipitation intensity"
@@ -20,5 +20,5 @@ rest:
     binary_sensor:
       - name: "Buienalarm precipitation expected"
         value_template: >-
-            {{ value_json['precip'][2] + value_json['precip'][3] + value_json['precip'][4] + value_json['precip'][4] + value_json['precip'][6] > 0 }}
+          {{ value_json['precip'][2] + value_json['precip'][3] + value_json['precip'][4] + value_json['precip'][4] + value_json['precip'][6] > 0 }}
 

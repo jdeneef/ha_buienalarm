@@ -22,7 +22,7 @@ Copy `buienalarm.yaml` and ensure the file is read from your `configuration.yaml
 
 ```yaml
 homeassistant:
-  packages: !include_dir_named packages
+    packages: !include_dir_named packages
 ```
 
 Followed by a reboot your homeassistant instance. 
@@ -45,11 +45,11 @@ The chart is plotted using [plotlygrap](https://github.com/dbuezas/lovelace-plot
 Next copy text from this `plotlygraph.yaml` and drop this in a manual card on any of your dashboards and you are done. The graph is adjustable, eg if you want to adjust the horizontal lines for light and medium rain, just adjust the `y0` and `y1` in the `shapes` section:
 
 ```yaml
-  shapes:
+shapes:
     - type: line
-      xref: paper
-      y0: 0.1
-      y1: 0.1
+        xref: paper
+y0: 0.1
+y1: 0.1
 ```
 
 ## Sample precipitation graph and history
