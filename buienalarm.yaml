@@ -27,5 +27,5 @@ rest:
       - name: "Buienalarm precipitation expected"
         unique_id: buienalarm_precipitation_expected
         value_template: >-
-          {{ value_json['precip'][2] + value_json['precip'][3] + value_json['precip'][4] + value_json['precip'][4] + value_json['precip'][6] > 0 }}
+          {{ value_json['precip'][2] + value_json['precip'][3] + value_json['precip'][4] + value_json['precip'][5] > 0.2 }}
 
