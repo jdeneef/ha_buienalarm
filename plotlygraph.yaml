@@ -5,7 +5,7 @@ time_offset: 110m
 refresh_interval: auto
 fn: |
   $fn ({ hass, vars }) => {
-    b2p = (b) => Math.pow(10,(b-109)/32).toFixed(1)
+    // b2p = (b) => Math.pow(10,(b-109)/32).toFixed(1)
     vars.x = []; vars.y = []; vars.color = []; vars.hover = []
     vars.unit_of_measurement = hass.states['sensor.buienalarm_precipitation_intensity']?.attributes?.unit_of_measurement
     vars.now = new Date();
@@ -17,7 +17,7 @@ fn: |
       d = new Date(t)
       t += delta
       vars.x.push(d)
-      p = b2p(b)
+      p = b // b2p(b)
       vars.y.push(p)
       if (+p>+vars.ymax) vars.ymax=p
       vars.hover.push(String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0") +  " <b>" + 
