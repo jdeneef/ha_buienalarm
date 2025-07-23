@@ -1,3 +1,2 @@
 .session.nvim
 *.env.json
-*.http

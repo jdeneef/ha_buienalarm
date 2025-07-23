@@ -1,0 +1,34 @@
+# lat/lon retrieved from http-client.env.json
+# https://neovim.getkulala.net/docs/usage/dotenv-and-http-client.env.json-support
+
+### GET Buienalarm
+# @name GETBUIENALARM
+GET https://cdn-secure.buienalarm.nl/api/3.4/forecast.php?lat={{lat}}&lon={{lon}}
+accept: application/json
+
+
+
+### Some tests to test vim rest api plugin kulala ;-)
+GET https://httpbin.org/get?start={{GETBUIENALARM.response.body.$.start}}
+accept: application/json
+
+
+### 
+POST https://httpbin.org/post
+content-type: application/x-www-form-urlencoded
+accept: application/json
+x-test: {{GETBUIENALARM.response.body.$.start}}
+
+start={{GETBUIENALARM.response.body.$.start}}&
+temp={{GETBUIENALARM.response.body.$.temp}}
+
+
+### 
+POST https://httpbin.org/post
+content-type: application/json
+accept: application/json
+
+{
+  "start": "{{GETBUIENALARM.response.body.$.start}}",
+  "temp": "{{GETBUIENALARM.response.body.$.temp}}"
+}
