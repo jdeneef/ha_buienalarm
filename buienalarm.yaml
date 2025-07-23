@@ -1,7 +1,7 @@
 rest:
   - scan_interval: 300
-    resource: https://cdn-secure.buienalarm.nl/api/3.4/forecast.php
     timeout: 30
+    resource: https://cdn-secure.buienalarm.nl/api/3.4/forecast.php
     params:
       lat: "{{state_attr('zone.home', 'latitude') | float(0) | round(1)}}"
       lon: "{{state_attr('zone.home', 'longitude') | float(0) | round(1)}}"
