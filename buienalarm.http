@@ -1,34 +1,57 @@
-# lat/lon retrieved from http-client.env.json
-# https://neovim.getkulala.net/docs/usage/dotenv-and-http-client.env.json-support
+# variables
+@hostname = httpbin.org
+@lat = 52.0
+@lon = 4.5
+
+@cfg.timeout = 5000
+@cfg.check_json_body = true
 
 ### GET Buienalarm
-# @name GETBUIENALARM
-GET https://cdn-secure.buienalarm.nl/api/3.4/forecast.php?lat={{lat}}&lon={{lon}}
+# local variable overrules global
+@hostname = cdn-secure.buienalarm.nl
+GET https://{{hostname}}/api/3.4/forecast.php
+lat={{lat}}
+lon={{lon}}
+unit=mm/u
+region=nl
 accept: application/json
 
+--{%
+local body = ctx.json_body()
+  ctx.set("start", body.start)
+  ctx.set("temp", body.temp)
+--%}
 
+###
+# GET Buienradar
+@hostname = gadgets.buienradar.nl
+GET https://{{hostname}}/data/raintext
+lat={{lat}}
+lon={{lon}}
+accept: application/text
 
-### Some tests to test vim rest api plugin kulala ;-)
-GET https://httpbin.org/get?start={{GETBUIENALARM.response.body.$.start}}
+### GET
+GET https://{{hostname}}/get
+id={{start}}
 accept: application/json
 
-
-### 
-POST https://httpbin.org/post
+###
+POST https://{{hostname}}/post
 content-type: application/x-www-form-urlencoded
 accept: application/json
-x-test: {{GETBUIENALARM.response.body.$.start}}
+x-test: {{start}}
 
-start={{GETBUIENALARM.response.body.$.start}}&
-temp={{GETBUIENALARM.response.body.$.temp}}
+start={{start}}&
+temp={{temp}}
 
 
-### 
+###
 POST https://httpbin.org/post
 content-type: application/json
 accept: application/json
 
 {
-  "start": "{{GETBUIENALARM.response.body.$.start}}",
-  "temp": "{{GETBUIENALARM.response.body.$.temp}}"
+  "start": "{{start}}",
+  "temp": "{{temp}}"
 }
+

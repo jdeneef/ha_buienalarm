@@ -1,31 +1,49 @@
-rest:
-  - scan_interval: 300
-    timeout: 30
+sensor:
+  - platform: rest
+    name: buienalarm_raw
+    unique_id: buienalarm_raw
     resource: https://cdn-secure.buienalarm.nl/api/3.4/forecast.php
+    scan_interval: 300
+    # timeout: 30 # timeout for ipv6 delays, seems no longer needed
     params:
       lat: "{{state_attr('zone.home', 'latitude') | float(0) | round(1)}}"
       lon: "{{state_attr('zone.home', 'longitude') | float(0) | round(1)}}"
       region: "nl"
       unit: "mm/u"
+    json_attributes:
+      - precip
+      - start
+      - delta
+    value_template: "{{ -3600 < value_json.start - now()|as_timestamp < 3600}}"
+
+template:
+  - trigger:
+      - platform: state
+        entity_id: sensor.buienalarm_raw
+
+    variables:
+      start: "{{ state_attr('sensor.buienalarm_raw', 'start') | int }}"
+      delta: "{{ state_attr('sensor.buienalarm_raw', 'delta') | int }}"
+      precip: "{{ state_attr('sensor.buienalarm_raw', 'precip') }}"
+      index: "{{ ((now() | as_timestamp) - start) / delta | int }}"
+
     sensor:
       - name: "Buienalarm precipitation intensity"
         unique_id: buienalarm_precepitation_intensity
-        value_template: >-
-          {% set i = ((now()|as_timestamp - value_json['start'])/value_json['delta']) | int %}
-          {# removed for updated api with mm/u 
-            {% set p = 10**((value_json['precip'][i]-109)/32) %}
-            {{ p | round(1) }}
-          #}
-          {{ value_json['precip'][i] }}
+        state: >-
+          {{ vars.precip[vars.index] if states("sensor.buienalarm_raw") else 0 }}
+        availability: >-
+          {{ states("sensor.buienalarm_raw") }}
         device_class: precipitation_intensity
         unit_of_measurement: "mm/h"
-        json_attributes:
-          - "precip"
-          - "start"
-          - "delta"
+
     binary_sensor:
       - name: "Buienalarm precipitation expected"
         unique_id: buienalarm_precipitation_expected
-        value_template: >-
-          {{ value_json['precip'][2] + value_json['precip'][3] + value_json['precip'][4] + value_json['precip'][5] > 0.2 }}
-
+        state: >-
+          {{ precip[2] + precip[3] + precip[4] + precip[5] > 0.2 if states("sensor.buienalarm_raw") else false }}
+        availability: >-
+          {{ states("sensor.buienalarm_raw") }}
+        attributes:
+          expected: "{{ precip[2:6] }}"
+          total: "{{ precip[2] + precip[3] + precip[4] + precip[5] }}"
