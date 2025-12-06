@@ -1,8 +1,5 @@
-sensor:
-  - platform: rest
-    name: buienalarm_raw
-    unique_id: buienalarm_raw
-    resource: https://cdn-secure.buienalarm.nl/api/3.4/forecast.php
+rest:
+  - resource: https://cdn-secure.buienalarm.nl/api/3.4/forecast.php
     scan_interval: 300
     # timeout: 30 # timeout for ipv6 delays, seems no longer needed
     params:
@@ -10,40 +7,36 @@ sensor:
       lon: "{{state_attr('zone.home', 'longitude') | float(0) | round(1)}}"
       region: "nl"
       unit: "mm/u"
-    json_attributes:
-      - precip
-      - start
-      - delta
-    value_template: "{{ -3600 < value_json.start - now()|as_timestamp < 3600}}"
+    sensor:
+      - name: buienalarm_api
+        unique_id: buienalarm_api
+        json_attributes:
+          - precip
+          - start
+          - delta
+        value_template: "{{ value_json }}"
+        availability: "{{ value_json is defined and value_json|length>0 and -3600 < value_json.start - now()|as_timestamp < 3600 }}"
 
 template:
-  - trigger:
-      - platform: state
-        entity_id: sensor.buienalarm_raw
-
+  - triggers:
+      - trigger: state
+        entity_id: sensor.buienalarm_api
     variables:
-      start: "{{ state_attr('sensor.buienalarm_raw', 'start') | int }}"
-      delta: "{{ state_attr('sensor.buienalarm_raw', 'delta') | int }}"
-      precip: "{{ state_attr('sensor.buienalarm_raw', 'precip') }}"
+      start: "{{ state_attr('sensor.buienalarm_api', 'start') | int }}"
+      delta: "{{ state_attr('sensor.buienalarm_api', 'delta') | int }}"
+      precip: "{{ state_attr('sensor.buienalarm_api', 'precip') }}"
       index: "{{ ((now() | as_timestamp) - start) / delta | int }}"
-
     sensor:
       - name: "Buienalarm precipitation intensity"
         unique_id: buienalarm_precepitation_intensity
         state: >-
-          {{ vars.precip[vars.index] if states("sensor.buienalarm_raw") else 0 }}
-        availability: >-
-          {{ states("sensor.buienalarm_raw") }}
+          {{ precip[index] }}
         device_class: precipitation_intensity
         unit_of_measurement: "mm/h"
-
     binary_sensor:
       - name: "Buienalarm precipitation expected"
         unique_id: buienalarm_precipitation_expected
         state: >-
-          {{ precip[2] + precip[3] + precip[4] + precip[5] > 0.2 if states("sensor.buienalarm_raw") else false }}
-        availability: >-
-          {{ states("sensor.buienalarm_raw") }}
+          {{ precip[2] + precip[3] + precip[4] + precip[5] > 0.2 }}
         attributes:
-          expected: "{{ precip[2:6] }}"
           total: "{{ precip[2] + precip[3] + precip[4] + precip[5] }}"
