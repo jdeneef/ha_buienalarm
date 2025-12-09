@@ -33,11 +33,11 @@ The integration will automatically use your Home zone `zone.home` location to pu
 
 Adding the file in your config creates sensors:
 
-| Sensor                        | Attribute          | Unit                                                                                                     | Comment                                                                           |
-| ----------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `sensor.buien*_api`           | `precip`, `start`, `delta` | n.a. | api poll result, for buienradar the api output, for buienalarm the api status, data stored in attributes 
-| `sensor.buien*_precipitation` | n.a.               | mm/h                                                                                                     | the sensor itself holds the precipitation intensity, attributes hold the api data |
-| `sensor.buien*_expected`      | n.a.               | Bool                                                                                                     | returns True when rain expected next 4 to 6 `delta` periods                       |
+| Sensor                        | Attribute                  | Unit | Comment                                                                                                  |
+| ----------------------------- | -------------------------- | ---- | -------------------------------------------------------------------------------------------------------- |
+| `sensor.buien*_api`           | `precip`, `start`, `delta` | n.a. | api poll result, for buienradar the api output, for buienalarm the api status, data stored in attributes |
+| `sensor.buien*_precipitation` | n.a.                       | mm/h | the sensor itself holds the precipitation intensity, attributes hold the api data                        |
+| `sensor.buien*_expected`      | n.a.                       | Bool | returns True when rain expected next 4 to 6 `delta` periods                                              |
 
 ## Setup of Graph
 
