@@ -3,8 +3,8 @@ rest:
     scan_interval: 300
     # timeout: 30 # timeout for ipv6 delays, seems no longer needed
     params:
-      lat: "{{state_attr('zone.home', 'latitude') | float(0) | round(1)}}"
-      lon: "{{state_attr('zone.home', 'longitude') | float(0) | round(1)}}"
+      lat: "{{'%.2f' | format(state_attr('zone.home', 'latitude') | float(0))}}"
+      lon: "{{'%.2f' | format(state_attr('zone.home', 'longitude') | float(0))}}"
       region: "nl"
       unit: "mm/u"
     sensor:
@@ -14,7 +14,7 @@ rest:
           - precip
           - start
           - delta
-        value_template: "{{ value_json }}"
+        value_template: "{{ value_json is defined and value_json|length>0 and -3600 < value_json.start - now()|as_timestamp < 3600 }}"
         availability: "{{ value_json is defined and value_json|length>0 and -3600 < value_json.start - now()|as_timestamp < 3600 }}"
 
 template:
@@ -25,18 +25,16 @@ template:
       start: "{{ state_attr('sensor.buienalarm_api', 'start') | int }}"
       delta: "{{ state_attr('sensor.buienalarm_api', 'delta') | int }}"
       precip: "{{ state_attr('sensor.buienalarm_api', 'precip') }}"
-      index: "{{ ((now() | as_timestamp) - start) / delta | int }}"
+      index: "{{ (((now() | as_timestamp) - start) / delta) | int }}"
     sensor:
-      - name: "Buienalarm precipitation intensity"
-        unique_id: buienalarm_precepitation_intensity
+      - name: "Buienalarm precipitation"
+        unique_id: buienalarm_precepitation
         state: >-
           {{ precip[index] }}
         device_class: precipitation_intensity
         unit_of_measurement: "mm/h"
     binary_sensor:
-      - name: "Buienalarm precipitation expected"
-        unique_id: buienalarm_precipitation_expected
+      - name: "Buienalarm expected"
+        unique_id: buienalarm_expected
         state: >-
-          {{ precip[2] + precip[3] + precip[4] + precip[5] > 0.2 }}
-        attributes:
-          total: "{{ precip[2] + precip[3] + precip[4] + precip[5] }}"
+          {{ precip[index+2] + precip[index+3] + precip[index+4] + precip[index+5] > 0.2 }}

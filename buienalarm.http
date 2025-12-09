@@ -1,7 +1,7 @@
 # variables
 @hostname = httpbin.org
-@lat = 52.0
-@lon = 4.5
+@lat = 51.99
+@lon = 4.50
 
 @cfg.timeout = 5000
 @cfg.check_json_body = true
@@ -12,9 +12,9 @@
 GET https://{{hostname}}/api/3.4/forecast.php
 lat={{lat}}
 lon={{lon}}
-unit=mm/u
 region=nl
-accept: application/json
+unit=mm/u
+cache-control: no-cache
 
 --{%
 local body = ctx.json_body()

@@ -1,0 +1,110 @@
+type: custom:plotly-graph
+title: Buienradar
+hours_to_show: 2.1
+time_offset: 120m
+refresh_interval: auto
+fn: |
+  $fn ({ hass, vars }) => {
+    // b2p = (b) => Math.pow(10,(b-109)/32).toFixed(1)
+    vars.x1 = []; vars.y1 = []; vars.color1 = []; vars.hover1 = []
+    vars.unit_of_measurement1 = hass.states['sensor.buienradar_precipitation']?.attributes?.unit_of_measurement
+    vars.now = new Date();
+    var t = hass.states['sensor.buienradar_precipitation']?.attributes?.start * 1000
+    var precip = hass.states['sensor.buienradar_precipitation']?.attributes?.precip || []
+    var delta = hass.states['sensor.buienradar_precipitation']?.attributes?.delta * 1000
+    vars.ymax = 0.4
+    precip.forEach(b => {
+      d = new Date(t)
+      t += delta
+      vars.x1.push(d)
+      p = b // b2p(b)
+      vars.y1.push(p)
+      if (+p>+vars.ymax) vars.ymax=p
+      vars.hover1.push(String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0") +  " <b>" + 
+        p + "</b> " + vars.unit_of_measurement1)
+    })
+    // console.log(vars)
+    vars.x2 = []; vars.y2 = []; vars.color2 = []; vars.hover2 = []
+    vars.unit_of_measurement2 = hass.states['sensor.buienradar_precipitation']?.attributes?.unit_of_measurement
+    var t = hass.states['sensor.buienalarm_api']?.attributes?.start * 1000
+    var precip = hass.states['sensor.buienalarm_api']?.attributes?.precip || []
+    var delta = hass.states['sensor.buienalarm_api']?.attributes?.delta * 1000
+    precip.forEach(b => {
+      d = new Date(t)
+      t += delta
+      vars.x2.push(d)
+      p = b // b2p(b)
+      vars.y2.push(p)
+      if (+p>+vars.ymax) vars.ymax=p
+      vars.hover2.push(String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0") +  " <b>" + 
+        p + "</b>" + vars.unit_of_measurement2)
+    })
+    //console.log(vars)
+
+  }
+entities:
+  - entity: sensor.buienradar_precipitation
+    name: BuienRadar
+    showlegend: true
+    x: $ex vars.x1
+    "y": $ex vars.y1
+    mode: scatter
+    fill: tozeroy
+    unit_of_measurement: $ex vars.unit_of_measurement1
+    hovertemplate: $ex vars.hover1
+    line:
+      shape: spline
+      width: 3
+  - entity: ""
+    name: Now
+    hovertemplate: Now
+    showlegend: false
+    x: $ex [ vars.now, vars.now ]
+    "y": $ex [ 0, vars.ymax ]
+    yaxis: y0
+  - entity: sensor.buienalarm_api
+    name: BuienAlarm
+    showlegend: true
+    x: $ex vars.x2
+    "y": $ex vars.y2
+    mode: scatter
+    fill: tozeroy
+    unit_of_measurement: $ex vars.unit_of_measurement2
+    hovertemplate: $ex vars.hover2
+    line:
+      color: lightblue
+      shape: spline
+      width: 3
+layout:
+  yaxis:
+    rangemode: nonnegative
+    fixedrange: true
+    range: $ex [0, vars.ymax + 0.05 ]
+  xaxis:
+    tickformat: "%H:%M"
+    fixedrange: true
+  shapes:
+    - type: line
+      xref: paper
+      x0: 0
+      x1: 1
+      y0: 0.1
+      y1: 0.1
+      line:
+        color: lightskyblue
+        dash: dot
+        width: 1
+    - type: line
+      xref: paper
+      x0: 0
+      x1: 1
+      y0: 0.25
+      y1: 0.25
+      line:
+        color: deepskyblue
+        dash: dot
+        width: 1
+config:
+  displayModeBar: false
+  scrollZoom: false
+

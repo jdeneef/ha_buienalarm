@@ -2,8 +2,8 @@ rest:
   - resource: https://gadgets.buienradar.nl/data/raintext
     # timeout: 30 # timeout for ipv6 delays, seems no longer needed
     params:
-      lat: "{{state_attr('zone.home', 'latitude') | float(0) | round(1)}}"
-      lon: "{{state_attr('zone.home', 'longitude') | float(0) | round(1)}}"
+      lat: "{{'%.2f' | format(state_attr('zone.home', 'latitude') | float(0))}}"
+      lon: "{{'%.2f' | format(state_attr('zone.home', 'longitude') | float(0))}}"
     scan_interval: 300
     sensor:
       - name: "Buienradar api"

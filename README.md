@@ -2,7 +2,7 @@
 
 Created this for my own use, because I wasn't happy with the available options.
 
-Note that data is used from [buienradar](https://www.buienradar.nl), I have no connection whatever with buienradar, just using the open api as made available by buienradar. This setup basically mimicks the buienalarm app, which is exactly the intended idea ;-)
+Note that data is used from [buienradar](https://www.buienradar.nl) and [buienalarm](https://www.buienalarm.nl), I have no connection whatever with buienradar or buienalarm, just using the open api as made available by both. This setup basically mimicks the buienalarm app, which is exactly the intended idea ;-)
 
 **This is working on my homeassistant environment, that's it. Shared for testing and usage at your own risk!**
 
@@ -20,7 +20,7 @@ This setup adds a [RESTful integration](https://www.home-assistant.io/integratio
 
 ## Setup of Sensors
 
-Copy `buienradar.yaml` and ensure the file is read from your `configuration.yaml`. Eg, drop the file in `/config/packages/` and use the `config` lines below to include the `packages` directory:
+Copy `buienradar.yaml` and/or `buienalarm.yaml` and ensure the file is read from your `configuration.yaml`. Eg, drop the file in `/config/packages/` and use the `config` lines below to include the `packages` directory:
 
 ```yaml
 homeassistant:
@@ -33,14 +33,11 @@ The integration will automatically use your Home zone `zone.home` location to pu
 
 Adding the file in your config creates sensors:
 
-| Sensor                            | Attribute | Unit            | Comment                                                                           |
-| --------------------------------- | --------- | --------------- | --------------------------------------------------------------------------------- |
-| `sensor.buienradar_api`           | n.a.      | api poll result |
-| `sensor.buienradar_precipitation` | n.a.      | mm/h            | the sensor itself holds the precipitation intensity, attributes hold the api data |
-| `sensor.buienradar_precipitation` | `precip`  | n.a.            | table with precipitation values per period `delta`                                |
-| `sensor.buienradar_precipitation` | `start`   | timestamp       | start time of `precip` table                                                      |
-| `sensor.buienradar_precipitation` | `delta`   | seconds         | measurement period of `precip` table                                              |
-| `sensor.buienradar_expected`      | n.a.      | Bool            | returns True when rain expected next 4 to 6 `delta` periods                       |
+| Sensor                        | Attribute          | Unit                                                                                                     | Comment                                                                           |
+| ----------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `sensor.buien*_api`           | `precip`, `start`, `delta` | n.a. | api poll result, for buienradar the api output, for buienalarm the api status, data stored in attributes 
+| `sensor.buien*_precipitation` | n.a.               | mm/h                                                                                                     | the sensor itself holds the precipitation intensity, attributes hold the api data |
+| `sensor.buien*_expected`      | n.a.               | Bool                                                                                                     | returns True when rain expected next 4 to 6 `delta` periods                       |
 
 ## Setup of Graph
 
