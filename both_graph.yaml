@@ -25,10 +25,10 @@ fn: |
     })
     // console.log(vars)
     vars.x2 = []; vars.y2 = []; vars.color2 = []; vars.hover2 = []
-    vars.unit_of_measurement2 = hass.states['sensor.buienradar_precipitation']?.attributes?.unit_of_measurement
-    var t = hass.states['sensor.buienalarm_api']?.attributes?.start * 1000
-    var precip = hass.states['sensor.buienalarm_api']?.attributes?.precip || []
-    var delta = hass.states['sensor.buienalarm_api']?.attributes?.delta * 1000
+    vars.unit_of_measurement2 = hass.states['sensor.buienalarm_precipitation']?.attributes?.unit_of_measurement
+    var t = hass.states['sensor.buienalarm_precipitation']?.attributes?.start * 1000
+    var precip = hass.states['sensor.buienalarm_precipitation']?.attributes?.precip || []
+    var delta = hass.states['sensor.buienalarm_precipitation']?.attributes?.delta * 1000
     precip.forEach(b => {
       d = new Date(t)
       t += delta

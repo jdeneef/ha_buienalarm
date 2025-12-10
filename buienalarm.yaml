@@ -14,27 +14,32 @@ rest:
           - precip
           - start
           - delta
-        value_template: "{{ value_json is defined and value_json|length>0 and -3600 < value_json.start - now()|as_timestamp < 3600 }}"
-        availability: "{{ value_json is defined and value_json|length>0 and -3600 < value_json.start - now()|as_timestamp < 3600 }}"
+        value_template: "{{ 'OK' if value_json is defined and value_json|length > 0 else 'NOK'}}"
 
 template:
   - triggers:
       - trigger: state
         entity_id: sensor.buienalarm_api
     variables:
-      start: "{{ state_attr('sensor.buienalarm_api', 'start') | int }}"
-      delta: "{{ state_attr('sensor.buienalarm_api', 'delta') | int }}"
+      valid: "{{states('sensor.buienalarm_api') != 'NOK' }}"
+      start: "{{ state_attr('sensor.buienalarm_api', 'start')|int(0) }}"
+      delta: "{{ state_attr('sensor.buienalarm_api', 'delta')|int(300) }}"
       precip: "{{ state_attr('sensor.buienalarm_api', 'precip') }}"
-      index: "{{ (((now() | as_timestamp) - start) / delta) | int }}"
+      index: "{{ (((now() | as_timestamp) - start) / delta) | int(0) }}"
     sensor:
       - name: "Buienalarm precipitation"
         unique_id: buienalarm_precepitation
+        # only update when call succeeded
         state: >-
-          {{ precip[index] }}
+          {{ precip[index] if valid else none}}
         device_class: precipitation_intensity
         unit_of_measurement: "mm/h"
+        attributes:
+          precip: "{{precip}}"
+          start: "{{start}}"
+          delta: "{{delta}}"
     binary_sensor:
       - name: "Buienalarm expected"
         unique_id: buienalarm_expected
         state: >-
-          {{ precip[index+2] + precip[index+3] + precip[index+4] + precip[index+5] > 0.2 }}
+          {{ precip[index+2] + precip[index+3] + precip[index+4] + precip[index+5] > 0.2 if valid else none }}
