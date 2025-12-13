@@ -1,31 +1,34 @@
 rest:
   - resource: https://gadgets.buienradar.nl/data/raintext
+    scan_interval: 300
     # timeout: 30 # timeout for ipv6 delays, seems no longer needed
     params:
       lat: "{{'%.2f' | format(state_attr('zone.home', 'latitude') | float(0))}}"
       lon: "{{'%.2f' | format(state_attr('zone.home', 'longitude') | float(0))}}"
-    scan_interval: 300
+    headers:
+      cache-control: "no-cache"
     sensor:
       - name: "Buienradar api"
         unique_id: buienradar_api
-        value_template: "{{ value if value is defined and value|length > 0 else 'NOK'}}"
+        value_template: "{{ value }}"
+        availability: "{{ value is defined and value|length>100 }}"
 
 template:
   - triggers:
-    - trigger: state
-      entity_id: sensor.buienradar_api
+      - trigger: state
+        entity_id: sensor.buienradar_api
+        not_to:
+          - unavailable
+          - unknown
     variables:
-      valid: "{{states('sensor.buienradar_api') != 'NOK'}}"
       precip: >-
           {%- set ns = namespace(start="", precip=[]) %}
-          {%- if valid %}
-            {%- for l in states("sensor.buienradar_api").split("\n") %}
-              {%- if l|length > 0 %}
-                {%- set v = l.split("|") %}
-                {%- set ns.precip = ns.precip + [ (10**((v[0]|int(0)-109)/32))|round(1) ] %}
-              {%- endif %}
-            {%- endfor %}
-          {%- endif %}
+          {%- for l in states("sensor.buienradar_api").split("\n") %}
+            {%- if l|length > 0 %}
+              {%- set v = l.split("|") %}
+              {%- set ns.precip = ns.precip + [ (10**((v[0]|int(0)-109)/32))|round(1) ] %}
+            {%- endif %}
+          {%- endfor %}
           {{ns.precip}}
 
     sensor:
@@ -33,7 +36,7 @@ template:
         unique_id: buienradar_precepitation
         # only update when call succeeded
         state: >-
-          {{ precip[0:1]|max if valid else none }}
+          {{ precip[0:1]|max }}
         device_class: precipitation_intensity
         unit_of_measurement: "mm/h"
         attributes:
@@ -46,4 +49,4 @@ template:
       - name: "Buienradar expected"
         unique_id: buienradar_expected
         state: >-
-          {{precip[2:6]|sum>0.3 if valid else none }}
+          {{precip[2:6]|sum>0.3 }}

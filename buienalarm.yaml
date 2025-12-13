@@ -7,6 +7,8 @@ rest:
       lon: "{{'%.2f' | format(state_attr('zone.home', 'longitude') | float(0))}}"
       region: "nl"
       unit: "mm/u"
+    headers:
+      cache-control: "no-cache"
     sensor:
       - name: buienalarm_api
         unique_id: buienalarm_api
@@ -14,24 +16,27 @@ rest:
           - precip
           - start
           - delta
-        value_template: "{{ 'OK' if value_json is defined and value_json|length > 0 else 'NOK'}}"
+        value_template: "{{ 'OK' if value_json is defined and value|length > 100 else 'NOK'}}"
+        availability: "{{ value_json is defined and value|length > 100 }}"
 
 template:
   - triggers:
       - trigger: state
         entity_id: sensor.buienalarm_api
+        not_to:
+          - unavailable
+          - unknown
     variables:
-      valid: "{{states('sensor.buienalarm_api') != 'NOK' }}"
       start: "{{ state_attr('sensor.buienalarm_api', 'start')|int(0) }}"
       delta: "{{ state_attr('sensor.buienalarm_api', 'delta')|int(300) }}"
-      precip: "{{ state_attr('sensor.buienalarm_api', 'precip') }}"
+      precip: "{{ state_attr('sensor.buienalarm_api', 'precip')|default([]) }}"
       index: "{{ (((now() | as_timestamp) - start) / delta) | int(0) }}"
     sensor:
       - name: "Buienalarm precipitation"
         unique_id: buienalarm_precepitation
         # only update when call succeeded
         state: >-
-          {{ precip[index] if valid else none}}
+          {{ precip[index] }}
         device_class: precipitation_intensity
         unit_of_measurement: "mm/h"
         attributes:
@@ -42,4 +47,4 @@ template:
       - name: "Buienalarm expected"
         unique_id: buienalarm_expected
         state: >-
-          {{ precip[index+2] + precip[index+3] + precip[index+4] + precip[index+5] > 0.2 if valid else none }}
+          {{ precip[index+2] + precip[index+3] + precip[index+4] + precip[index+5] > 0.2 }}

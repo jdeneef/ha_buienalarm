@@ -28,7 +28,8 @@ local body = ctx.json_body()
 GET https://{{hostname}}/data/raintext
 lat={{lat}}
 lon={{lon}}
-accept: application/text
+cache-control: no-cache
+
 
 ### GET
 GET https://{{hostname}}/get
