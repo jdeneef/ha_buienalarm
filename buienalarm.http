@@ -1,7 +1,7 @@
 # variables
 @hostname = httpbin.org
-@lat = 51.99
-@lon = 4.50
+@lat = {{>> ./env.sh lat}}
+@lon = {{>> ./env.sh lon}}
 
 @cfg.timeout = 5000
 @cfg.check_json_body = true
