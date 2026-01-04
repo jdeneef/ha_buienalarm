@@ -16,8 +16,8 @@ rest:
           - precip
           - start
           - delta
-        value_template: "{{ 'OK' if value_json is defined and value|length > 100 else 'NOK'}}"
-        availability: "{{ value_json is defined and value|length > 100 }}"
+        value_template: "OK"
+        availability: "{{ value_json is defined and 'success' in value_json and value_json.success == true}}"
 
 template:
   - triggers:
