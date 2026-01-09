@@ -20,6 +20,9 @@ template:
         not_to:
           - unavailable
           - unknown
+    conditions:
+      condition: template
+      value_template: "{{ has_value('sensor.buienradar_api')}}"
     variables:
       precip: >-
           {%- set ns = namespace(start="", precip=[]) %}
